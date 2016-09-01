@@ -24,6 +24,8 @@ namespace Acr.Notifications
         public TimeSpan? When { get; set; }
         public DateTime? Date { get; set; }
 
+		public NotificationInterval Interval { get; set; } = NotificationInterval.None;
+
 		public Notification SetId(int? id) {
 			this.Id = id;
 			return this;
@@ -35,6 +37,10 @@ namespace Acr.Notifications
             return this;
         }
 
+		public Notification SetInterval(NotificationInterval interval) {
+			this.Interval = interval;
+			return this;
+		}
 
         public Notification SetMessage(string message)
         {
