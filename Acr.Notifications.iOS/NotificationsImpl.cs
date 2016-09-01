@@ -30,7 +30,7 @@ namespace Acr.Notifications
 
         public override string Send(Notification notification)
         {
-            var msgId = Guid.NewGuid().ToString();
+            var msgId = notification.Id.HasValue ? notification.Id.Value.ToString() : Guid.NewGuid().ToString();
             var userInfo = new NSMutableDictionary();
             userInfo.Add(new NSString("MessageID"), new NSString(msgId));
 

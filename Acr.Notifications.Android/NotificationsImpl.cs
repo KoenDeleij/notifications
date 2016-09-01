@@ -24,7 +24,7 @@ namespace Acr.Notifications
 
         public override string Send(Notification notification)
         {
-            var id = NotificationSettings.Instance.CreateScheduleId();
+			int id = notification.Id.HasValue ? notification.Id.Value : NotificationSettings.Instance.CreateScheduleId();
 
             if (notification.IsScheduled)
             {

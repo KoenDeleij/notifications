@@ -14,16 +14,20 @@ namespace Acr.Notifications
         public string Title { get; set; } = DefaultTitle;
         public string Message { get; set; } = DefaultSound;
         public string Sound { get; set; }
-
+		public int? Id { get; set; }
 
         /// <summary>
-        /// Only works with Androi
+        /// Only works with Android
         /// </summary>
         public bool Vibrate { get; set; }
 
         public TimeSpan? When { get; set; }
         public DateTime? Date { get; set; }
 
+		public Notification SetId(int? id) {
+			this.Id = id;
+			return this;
+		}
 
         public Notification SetTitle(string title)
         {
