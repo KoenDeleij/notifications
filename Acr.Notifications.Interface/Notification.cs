@@ -15,6 +15,7 @@ namespace Acr.Notifications
         public string Message { get; set; } = DefaultSound;
         public string Sound { get; set; }
 		public int? Id { get; set; }
+		public int? BadgeCount { get; set; }
 
         /// <summary>
         /// Only works with Android
@@ -47,6 +48,12 @@ namespace Acr.Notifications
             this.Message = message;
             return this;
         }
+
+
+		public Notification SetBadgeCount(int count) {
+			this.BadgeCount = count;
+			return this;
+		}
 
 
         public Notification SetSound(string sound)
