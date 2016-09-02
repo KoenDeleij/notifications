@@ -40,8 +40,7 @@ namespace Acr.Notifications
 				}
 				else {
 					//depending on the interval, calculate the next trigger
-					//DateTime secondTrigger = notification.SendTime.AddDays(notification.Interval == NotificationInterval.Daily ? 1 : 7);
-					DateTime secondTrigger = notification.SendTime.AddMinutes(notification.Interval == NotificationInterval.Daily ? 1 : 5);
+					DateTime secondTrigger = notification.SendTime.AddDays(notification.Interval == NotificationInterval.Daily ? 1 : 7);
 
 					//substract the current trigger to get the inteval
 					var intervalMs = this.GetEpochMills(secondTrigger)-triggerMs;
@@ -63,7 +62,7 @@ namespace Acr.Notifications
                 .SetContentIntent(TaskStackBuilder
                     .Create(Application.Context)
                     .AddNextIntent(launchIntent)
-                    .GetPendingIntent(id, (int)PendingIntentFlags.OneShot)
+                    .GetPendingIntent(id, (int)PendingIntentFlags.UpdateCurrent)
                 );
 
             if (notification.Vibrate)

@@ -36,15 +36,24 @@ namespace Acr.Notifications
 
             var not = new UILocalNotification
             {
-                FireDate = (NSDate)notification.SendTime,
+				FireDate = notification.SendTime.DateTimeToNSDate(),
                 AlertAction = notification.Title,
                 AlertBody = notification.Message,
                 SoundName = notification.Sound,
                 UserInfo = userInfo
             };
+
+			if (notification.Interval != NotificationInterval.None) {
+				not.RepeatInterval = notification.Interval == NotificationInterval.Weekly ? NSCalendarUnit.Week : NSCalendarUnit.Day;
+			}
+
+			if (notification.BadgeCount.HasValue) {
+				not.ApplicationIconBadgeNumber = notification.BadgeCount.Value;
+			}
+
             UIApplication.SharedApplication.ScheduleLocalNotification(not);
             return msgId;
-        }
+		}
 
 
         public override bool Cancel(string messageId)
@@ -77,3 +86,4 @@ namespace Acr.Notifications
         }
     }
 }
+ 
