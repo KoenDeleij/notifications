@@ -19,7 +19,7 @@ namespace Acr.Notifications
             var intent = new Intent(Application.Context, typeof(AlarmBroadcastReceiver))
                 .PutExtra(NOTIFICATION_ID, id)
                 .PutExtra(DATA_KEY, json);
-            var pending = PendingIntent.GetBroadcast(Application.Context, id, intent, PendingIntentFlags.OneShot);
+			var pending = PendingIntent.GetBroadcast(Application.Context, id, intent, PendingIntentFlags.UpdateCurrent);
             return pending;
         }
 
@@ -29,7 +29,7 @@ namespace Acr.Notifications
             var intent = new Intent(Application.Context, typeof(AlarmBroadcastReceiver))
                 .PutExtra(NOTIFICATION_ID, id)
                 .PutExtra(DATA_KEY, "hack");
-            var pending = PendingIntent.GetBroadcast(Application.Context, id, intent, PendingIntentFlags.OneShot);
+            var pending = PendingIntent.GetBroadcast(Application.Context, id, intent, PendingIntentFlags.UpdateCurrent);
             return pending;
         }
 

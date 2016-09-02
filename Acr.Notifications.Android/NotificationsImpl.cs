@@ -31,11 +31,22 @@ namespace Acr.Notifications
                 var triggerMs = this.GetEpochMills(notification.SendTime);
                 var pending = notification.ToPendingIntent(id);
 
-                this.alarmManager.Set(
-                    AlarmType.RtcWakeup,
-                    Convert.ToInt64(triggerMs),
-                    pending
-                );
+				if (notification.Interval == NotificationInterval.None) {
+					this.alarmManager.Set(
+						AlarmType.RtcWakeup,
+						Convert.ToInt64(triggerMs),
+						pending
+						);
+				}
+				else {
+					//depending on the interval, calculate the next trigger
+					//DateTime secondTrigger = notification.SendTime.AddDays(notification.Interval == NotificationInterval.Daily ? 1 : 7);
+					DateTime secondTrigger = notification.SendTime.AddMinutes(notification.Interval == NotificationInterval.Daily ? 1 : 5);
+
+					//substract the current trigger to get the inteval
+					var intervalMs = this.GetEpochMills(secondTrigger)-triggerMs;
+					this.alarmManager.SetRepeating(AlarmType.Rtc, triggerMs, intervalMs, pending);
+				}
 
                 return id.ToString();
             }
