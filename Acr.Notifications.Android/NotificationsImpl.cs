@@ -28,7 +28,7 @@ namespace Acr.Notifications
 
             if (notification.IsScheduled)
             {
-                var triggerMs = this.GetEpochMills(notification.SendTime);
+				var triggerMs = notification.SendTime.ToEpochMills();
                 var pending = notification.ToPendingIntent(id);
 
 				if (notification.Interval == NotificationInterval.None) {
@@ -43,7 +43,7 @@ namespace Acr.Notifications
 					DateTime secondTrigger = notification.SendTime.AddDays(notification.Interval == NotificationInterval.Daily ? 1 : 7);
 
 					//substract the current trigger to get the inteval
-					var intervalMs = this.GetEpochMills(secondTrigger)-triggerMs;
+					var intervalMs = secondTrigger.ToEpochMills()-triggerMs;
 					this.alarmManager.SetRepeating(AlarmType.Rtc, triggerMs, intervalMs, pending);
 				}
 
@@ -132,16 +132,6 @@ namespace Acr.Notifications
                 vibrate.Vibrate(ms);
             }
         }
-
-
-        protected virtual long GetEpochMills(DateTime sendTime)
-        {
-            var utc = sendTime.ToUniversalTime();
-            var epochDiff = (new DateTime(1970, 1, 1) - DateTime.MinValue).TotalSeconds;
-            var utcAlarmTimeInMillis = utc.AddSeconds(-epochDiff).Ticks / 10000;
-            return utcAlarmTimeInMillis;
-        }
-
 
         void CancelInternal(int notificationId)
         {
