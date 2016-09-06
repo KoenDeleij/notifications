@@ -76,6 +76,11 @@ namespace Acr.Notifications
                 var uri = Android.Net.Uri.FromFile(file);
                 builder.SetSound(uri);
             }
+
+			if (notification.BadgeCount.HasValue) {
+				this.Badge = notification.BadgeCount.Value;
+			}
+
             var not = builder.Build();
             NotificationManagerCompat
                 .From(Application.Context)
@@ -113,11 +118,16 @@ namespace Acr.Notifications
             get { return NotificationSettings.Instance.CurrentBadge; }
             set
             {
-                NotificationSettings.Instance.CurrentBadge = value;
-                if (value <= 0)
-                    ME.Leolin.Shortcutbadger.ShortcutBadger.RemoveCount(Application.Context);
-                else
-                    ME.Leolin.Shortcutbadger.ShortcutBadger.ApplyCount(Application.Context, value);
+				try {
+					NotificationSettings.Instance.CurrentBadge = value;
+					if (value <= 0)
+						ME.Leolin.Shortcutbadger.ShortcutBadger.RemoveCount(Application.Context);
+					else
+						ME.Leolin.Shortcutbadger.ShortcutBadger.ApplyCount(Application.Context, value);
+				}
+				catch (Exception e) {
+					//
+				}
             }
         }
 
