@@ -14,16 +14,23 @@ namespace Acr.Notifications
         public string Title { get; set; } = DefaultTitle;
         public string Message { get; set; } = DefaultSound;
         public string Sound { get; set; }
-
+		public int? Id { get; set; }
+		public int? BadgeCount { get; set; }
 
         /// <summary>
-        /// Only works with Androi
+        /// Only works with Android
         /// </summary>
         public bool Vibrate { get; set; }
 
         public TimeSpan? When { get; set; }
         public DateTime? Date { get; set; }
 
+		public NotificationInterval Interval { get; set; } = NotificationInterval.None;
+
+		public Notification SetId(int? id) {
+			this.Id = id;
+			return this;
+		}
 
         public Notification SetTitle(string title)
         {
@@ -31,12 +38,22 @@ namespace Acr.Notifications
             return this;
         }
 
+		public Notification SetInterval(NotificationInterval interval) {
+			this.Interval = interval;
+			return this;
+		}
 
         public Notification SetMessage(string message)
         {
             this.Message = message;
             return this;
         }
+
+
+		public Notification SetBadgeCount(int count) {
+			this.BadgeCount = count;
+			return this;
+		}
 
 
         public Notification SetSound(string sound)

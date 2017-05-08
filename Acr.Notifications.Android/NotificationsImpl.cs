@@ -24,18 +24,28 @@ namespace Acr.Notifications
 
         public override string Send(Notification notification)
         {
-            var id = NotificationSettings.Instance.CreateScheduleId();
+			int id = notification.Id.HasValue ? notification.Id.Value : NotificationSettings.Instance.CreateScheduleId();
 
             if (notification.IsScheduled)
             {
-                var triggerMs = this.GetEpochMills(notification.SendTime);
+				var triggerMs = notification.SendTime.ToEpochMills();
                 var pending = notification.ToPendingIntent(id);
 
-                this.alarmManager.Set(
-                    AlarmType.RtcWakeup,
-                    Convert.ToInt64(triggerMs),
-                    pending
-                );
+				if (notification.Interval == NotificationInterval.None) {
+					this.alarmManager.Set(
+						AlarmType.RtcWakeup,
+						Convert.ToInt64(triggerMs),
+						pending
+						);
+				}
+				else {
+					//depending on the interval, calculate the next trigger
+					DateTime secondTrigger = notification.SendTime.AddDays(notification.Interval == NotificationInterval.Daily ? 1 : 7);
+
+					//substract the current trigger to get the inteval
+					var intervalMs = secondTrigger.ToEpochMills()-triggerMs;
+					this.alarmManager.SetRepeating(AlarmType.Rtc, triggerMs, intervalMs, pending);
+				}
 
                 return id.ToString();
             }
@@ -52,7 +62,7 @@ namespace Acr.Notifications
                 .SetContentIntent(TaskStackBuilder
                     .Create(Application.Context)
                     .AddNextIntent(launchIntent)
-                    .GetPendingIntent(id, (int)PendingIntentFlags.OneShot)
+                    .GetPendingIntent(id, (int)PendingIntentFlags.UpdateCurrent)
                 );
 
             if (notification.Vibrate)
@@ -66,6 +76,11 @@ namespace Acr.Notifications
                 var uri = Android.Net.Uri.FromFile(file);
                 builder.SetSound(uri);
             }
+
+			if (notification.BadgeCount.HasValue) {
+				this.Badge = notification.BadgeCount.Value;
+			}
+
             var not = builder.Build();
             NotificationManagerCompat
                 .From(Application.Context)
@@ -103,11 +118,16 @@ namespace Acr.Notifications
             get { return NotificationSettings.Instance.CurrentBadge; }
             set
             {
-                NotificationSettings.Instance.CurrentBadge = value;
-                if (value <= 0)
-                    ME.Leolin.Shortcutbadger.ShortcutBadger.RemoveCount(Application.Context);
-                else
-                    ME.Leolin.Shortcutbadger.ShortcutBadger.ApplyCount(Application.Context, value);
+				try {
+					NotificationSettings.Instance.CurrentBadge = value;
+					if (value <= 0)
+						ME.Leolin.Shortcutbadger.ShortcutBadger.RemoveCount(Application.Context);
+					else
+						ME.Leolin.Shortcutbadger.ShortcutBadger.ApplyCount(Application.Context, value);
+				}
+				catch (Exception e) {
+					//
+				}
             }
         }
 
@@ -122,16 +142,6 @@ namespace Acr.Notifications
                 vibrate.Vibrate(ms);
             }
         }
-
-
-        protected virtual long GetEpochMills(DateTime sendTime)
-        {
-            var utc = sendTime.ToUniversalTime();
-            var epochDiff = (new DateTime(1970, 1, 1) - DateTime.MinValue).TotalSeconds;
-            var utcAlarmTimeInMillis = utc.AddSeconds(-epochDiff).Ticks / 10000;
-            return utcAlarmTimeInMillis;
-        }
-
 
         void CancelInternal(int notificationId)
         {
